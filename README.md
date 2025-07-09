@@ -1,0 +1,10 @@
+```    implementation("com.kaplandev.aic:aic:1.0")
+    implementation("com.kaplandev.gitdw:gitdw:1.0")
+    implementation("com.kaplandev:erorlog:1.1")
+    implementation("com.kaplandev.teamcord:teamcord:1.0")
+    implementation("com.kaplandev.jphotoeditor:jphotoeditor:1.0")
+    implementation("com.kaplandev.untitled:untitled:1.0")
+    implementation("com.kaplandev.kaplanhome:kaplanhome:1.0")
+    implementation("com.kaplandev.bidibidi:bidibidi:1.0")
+    implementation("com.kaplandev.mobpvp:mobpvp:3.0.4")
+```
