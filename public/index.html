@@ -2,27 +2,524 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>KaplanMaven Web</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaplanMaven - Paket Yükleme Sihirbazı</title>
+  <style>
+    /* === SETUP AŞAMA 1: TEMEL TEMA === */
+    :root {
+      --primary: #6C63FF;
+      --primary-dark: #564FD8;
+      --secondary: #FF6584;
+      --success: #4BB543;
+      --light: #F8F9FA;
+      --dark: #2B2D42;
+      --gray: #8D99AE;
+      --light-gray: #EDF2F4;
+      --border-radius: 12px;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    /* === SETUP AŞAMA 2: SAYFA MİMARİSİ === */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--light-gray) 0%, #E2E8F0 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: var(--dark);
+    }
+
+    /* === SETUP AŞAMA 3: SİHİRBAZ KONTEYNIRI === */
+    .wizard {
+      background: white;
+      width: 100%;
+      max-width: 700px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* === SETUP AŞAMA 4: PROGRESS BAR === */
+    .progress-container {
+      display: flex;
+      height: 8px;
+      background: var(--light-gray);
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transition: width 0.5s ease;
+    }
+
+    /* === SETUP AŞAMA 5: ADIMLAR İÇERİĞİ === */
+    .step {
+      padding: 40px;
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* === SETUP AŞAMA 6: BAŞLIKLAR === */
+    .step-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .step-icon {
+      font-size: 50px;
+      margin-bottom: 15px;
+      color: var(--primary);
+    }
+
+    .step-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .step-subtitle {
+      color: var(--gray);
+      font-size: 16px;
+    }
+
+    /* === SETUP AŞAMA 7: FORM ELEMANLARI === */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid var(--light-gray);
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      transition: var(--transition);
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+      outline: none;
+    }
+
+    /* === SETUP AŞAMA 8: DOSYA YÜKLEME ALANI === */
+    .file-upload {
+      border: 2px dashed var(--gray);
+      border-radius: var(--border-radius);
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 20px;
+    }
+
+    .file-upload:hover {
+      border-color: var(--primary);
+      background: rgba(108, 99, 255, 0.05);
+    }
+
+    .file-upload i {
+      font-size: 40px;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+
+    .file-upload p {
+      color: var(--gray);
+    }
+
+    .file-upload strong {
+      color: var(--primary);
+    }
+
+    /* === SETUP AŞAMA 9: BUTONLAR === */
+    .btn-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-next {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-next:hover {
+      background: var(--primary-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+    }
+
+    .btn-prev {
+      background: var(--light-gray);
+      color: var(--dark);
+    }
+
+    .btn-prev:hover {
+      background: #E2E8F0;
+    }
+
+    .btn-submit {
+      background: var(--success);
+      color: white;
+      width: 100%;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(75, 181, 67, 0.3);
+    }
+
+    /* === SETUP AŞAMA 10: RESPONSIVE AYARLAR === */
+    @media (max-width: 768px) {
+      .wizard {
+        max-width: 100%;
+      }
+      
+      .step {
+        padding: 30px 20px;
+      }
+      
+      .step-title {
+        font-size: 20px;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-  <h2>📦 Maven Paket Yükle</h2>
-  <form action="/upload" method="post" enctype="multipart/form-data">
-    <label>Full Group ID:</label><br>
-    <input type="text" name="fullGroupId" required><br><br>
+  <div class="wizard">
+    <div class="progress-container">
+      <div class="progress-bar" id="progress" style="width: 25%"></div>
+    </div>
 
-    <label>Pom Group ID:</label><br>
-    <input type="text" name="pomGroupId" required><br><br>
+    <!-- ADIM 1: GRUP BİLGİLERİ -->
+    <div class="step active" id="step1">
+      <div class="step-header">
+        <div class="step-icon">
+          <i class="fas fa-layer-group"></i>
+        </div>
+        <h2 class="step-title">Grup Bilgileri</h2>
+        <p class="step-subtitle">Maven paketinizin grup ID bilgilerini girin</p>
+      </div>
 
-    <label>Artifact ID:</label><br>
-    <input type="text" name="artifactId" required><br><br>
+      <div class="form-group">
+        <label for="fullGroupId">Full Group ID</label>
+        <input type="text" id="fullGroupId" placeholder="com.example.ornek">
+      </div>
 
-    <label>Version:</label><br>
-    <input type="text" name="version" required><br><br>
+      <div class="form-group">
+        <label for="pomGroupId">Pom Group ID</label>
+        <input type="text" id="pomGroupId" placeholder="com.example">
+      </div>
 
-    <label>.jar Dosyası:</label><br>
-    <input type="file" name="jarfile" accept=".jar" required><br><br>
+      <div class="btn-container">
+        <div></div> <!-- Boş div ile sağa yaslama -->
+        <button class="btn btn-next" onclick="nextStep(1)">Devam <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
 
-    <button type="submit">Yükle</button>
-  </form>
+    <!-- ADIM 2: PROJE BİLGİLERİ -->
+    <div class="step" id="step2">
+      <div class="step-header">
+        <div class="step-icon">
+          <i class="fas fa-project-diagram"></i>
+        </div>
+        <h2 class="step-title">Proje Bilgileri</h2>
+        <p class="step-subtitle">Artifact ID ve versiyon bilgilerini girin</p>
+      </div>
+
+      <div class="form-group">
+        <label for="artifactId">Artifact ID</label>
+        <input type="text" id="artifactId" placeholder="ornek-proje">
+      </div>
+
+      <div class="form-group">
+        <label for="version">Versiyon</label>
+        <input type="text" id="version" placeholder="1.0.0">
+      </div>
+
+      <div class="btn-container">
+        <button class="btn btn-prev" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Geri</button>
+        <button class="btn btn-next" onclick="nextStep(2)">Devam <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- ADIM 3: DOSYA YÜKLEME -->
+    <div class="step" id="step3">
+      <div class="step-header">
+        <div class="step-icon">
+          <i class="fas fa-file-upload"></i>
+        </div>
+        <h2 class="step-title">JAR Dosyasını Yükle</h2>
+        <p class="step-subtitle">Projenizin JAR dosyasını seçin</p>
+      </div>
+
+      <div class="form-group">
+        <div class="file-upload" id="fileUploadArea">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <p>Dosyayı sürükleyip bırakın veya <strong>tıklayarak seçin</strong></p>
+          <input type="file" id="jarfile" accept=".jar" style="display: none;">
+        </div>
+        <div id="fileName">Henüz dosya seçilmedi</div>
+      </div>
+
+      <div class="btn-container">
+        <button class="btn btn-prev" onclick="prevStep(3)"><i class="fas fa-arrow-left"></i> Geri</button>
+        <button class="btn btn-next" onclick="nextStep(3)">Devam <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- ADIM 4: ÖZET VE ONAY -->
+    <div class="step" id="step4">
+      <div class="step-header">
+        <div class="step-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h2 class="step-title">Bilgileri Onayla</h2>
+        <p class="step-subtitle">Girdiğiniz bilgileri kontrol edin</p>
+      </div>
+
+      <div class="form-group">
+        <h3 style="margin-bottom: 15px; color: var(--primary);">Paket Bilgileri</h3>
+        <div id="summaryContent" style="background: var(--light-gray); padding: 20px; border-radius: var(--border-radius);">
+          <!-- Bilgiler buraya dinamik olarak eklenecek -->
+        </div>
+      </div>
+
+      <div class="btn-container">
+        <button class="btn btn-prev" onclick="prevStep(4)"><i class="fas fa-arrow-left"></i> Geri</button>
+        <button class="btn btn-submit" onclick="submitForm()"><i class="fas fa-paper-plane"></i> Paketi Yükle</button>
+      </div>
+    </div>
+  </div>
+
+ <script>
+    // Adım geçiş fonksiyonları
+    function nextStep(currentStep) {
+      // Form validasyon kontrolü
+      if(currentStep === 1 && !validateStep1()) return;
+      if(currentStep === 2 && !validateStep2()) return;
+      if(currentStep === 3 && !validateStep3()) return;
+      
+      document.getElementById(`step${currentStep}`).classList.remove('active');
+      document.getElementById(`step${currentStep + 1}`).classList.add('active');
+      updateProgressBar(currentStep + 1);
+      
+      // Son adıma gelindiğinde özeti oluştur
+      if(currentStep === 3) {
+        generateSummary();
+      }
+    }
+
+    function prevStep(currentStep) {
+      document.getElementById(`step${currentStep}`).classList.remove('active');
+      document.getElementById(`step${currentStep - 1}`).classList.add('active');
+      updateProgressBar(currentStep - 1);
+    }
+
+    // Progress bar güncelleme
+    function updateProgressBar(step) {
+      const progressPercentage = (step / 4) * 100;
+      document.getElementById('progress').style.width = `${progressPercentage}%`;
+    }
+
+    // Dosya yükleme alanı etkileşimi
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('jarfile');
+    const fileName = document.getElementById('fileName');
+
+    fileUploadArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        fileName.textContent = `Seçilen dosya: ${fileInput.files[0].name}`;
+        fileName.style.color = 'var(--primary)';
+        fileName.style.fontWeight = '500';
+      }
+    });
+
+    // Sürükle bırak özelliği
+    fileUploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileUploadArea.style.borderColor = 'var(--primary)';
+      fileUploadArea.style.background = 'rgba(108, 99, 255, 0.1)';
+    });
+
+    fileUploadArea.addEventListener('dragleave', () => {
+      fileUploadArea.style.borderColor = 'var(--gray)';
+      fileUploadArea.style.background = 'white';
+    });
+
+    fileUploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileUploadArea.style.borderColor = 'var(--gray)';
+      fileUploadArea.style.background = 'white';
+      
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        fileName.textContent = `Seçilen dosya: ${e.dataTransfer.files[0].name}`;
+        fileName.style.color = 'var(--primary)';
+        fileName.style.fontWeight = '500';
+      }
+    });
+
+    // Adım validasyon fonksiyonları
+    function validateStep1() {
+      const fullGroupId = document.getElementById('fullGroupId').value;
+      const pomGroupId = document.getElementById('pomGroupId').value;
+      
+      if(!fullGroupId || !pomGroupId) {
+        alert('Lütfen tüm grup bilgilerini doldurunuz');
+        return false;
+      }
+      return true;
+    }
+    
+    function validateStep2() {
+      const artifactId = document.getElementById('artifactId').value;
+      const version = document.getElementById('version').value;
+      
+      if(!artifactId || !version) {
+        alert('Lütfen tüm proje bilgilerini doldurunuz');
+        return false;
+      }
+      return true;
+    }
+    
+    function validateStep3() {
+      const jarFile = document.getElementById('jarfile').files[0];
+      
+      if(!jarFile) {
+        alert('Lütfen bir JAR dosyası seçiniz');
+        return false;
+      }
+      return true;
+    }
+    
+    // Özet sayfası için bilgileri topla
+    function generateSummary() {
+      const fullGroupId = document.getElementById('fullGroupId').value;
+      const pomGroupId = document.getElementById('pomGroupId').value;
+      const artifactId = document.getElementById('artifactId').value;
+      const version = document.getElementById('version').value;
+      const jarFile = document.getElementById('jarfile').files[0]?.name || 'Dosya seçilmedi';
+
+      const summaryContent = document.getElementById('summaryContent');
+      summaryContent.innerHTML = `
+        <div style="margin-bottom: 15px;">
+          <p><strong>Full Group ID:</strong> ${fullGroupId}</p>
+          <p><strong>Pom Group ID:</strong> ${pomGroupId}</p>
+        </div>
+        <div style="margin-bottom: 15px;">
+          <p><strong>Artifact ID:</strong> ${artifactId}</p>
+          <p><strong>Versiyon:</strong> ${version}</p>
+        </div>
+        <div>
+          <p><strong>JAR Dosyası:</strong> ${jarFile}</p>
+        </div>
+      `;
+    }
+
+    // Form gönderme fonksiyonu
+    function submitForm() {
+      const fullGroupId = document.getElementById('fullGroupId').value;
+      const pomGroupId = document.getElementById('pomGroupId').value;
+      const artifactId = document.getElementById('artifactId').value;
+      const version = document.getElementById('version').value;
+      const jarFile = document.getElementById('jarfile').files[0];
+
+      // FormData oluşturma
+      const formData = new FormData();
+      formData.append('fullGroupId', fullGroupId);
+      formData.append('pomGroupId', pomGroupId);
+      formData.append('artifactId', artifactId);
+      formData.append('version', version);
+      formData.append('jarfile', jarFile);
+
+      // Yükleme butonunu devre dışı bırak
+      const submitBtn = document.querySelector('.btn-submit');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yükleniyor...';
+
+      // Fetch API ile POST isteği
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Başarılı yanıt
+        alert(`Paket başarıyla yüklendi! ${data.message || ''}`);
+        
+        // Formu sıfırlama
+        document.getElementById('fullGroupId').value = '';
+        document.getElementById('pomGroupId').value = '';
+        document.getElementById('artifactId').value = '';
+        document.getElementById('version').value = '';
+        document.getElementById('jarfile').value = '';
+        document.getElementById('fileName').textContent = 'Henüz dosya seçilmedi';
+        document.getElementById('fileName').style.color = '';
+        document.getElementById('fileName').style.fontWeight = '';
+        
+        // İlk adıma dön
+        document.getElementById('step4').classList.remove('active');
+        document.getElementById('step1').classList.add('active');
+        updateProgressBar(1);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert(`Yükleme hatası: ${error.message}`);
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Paketi Yükle';
+      });
+    }
+  </script>
 </body>
 </html>
