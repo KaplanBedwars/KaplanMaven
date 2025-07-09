@@ -6,5 +6,6 @@
     implementation("com.kaplandev.untitled:untitled:1.0")
     implementation("com.kaplandev.kaplanhome:kaplanhome:1.0")
     implementation("com.kaplandev.bidibidi:bidibidi:1.0")
+    implementation("com.kaplandev.mobpvpsettingsDisabled:Settings-Disabled:1.0")
     implementation("com.kaplandev.mobpvp:mobpvp:3.0.4")
 ```
