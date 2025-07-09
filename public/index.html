@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>KaplanMaven Web</title>
+</head>
+<body>
+  <h2>📦 Maven Paket Yükle</h2>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <label>Full Group ID:</label><br>
+    <input type="text" name="fullGroupId" required><br><br>
+
+    <label>Pom Group ID:</label><br>
+    <input type="text" name="pomGroupId" required><br><br>
+
+    <label>Artifact ID:</label><br>
+    <input type="text" name="artifactId" required><br><br>
+
+    <label>Version:</label><br>
+    <input type="text" name="version" required><br><br>
+
+    <label>.jar Dosyası:</label><br>
+    <input type="file" name="jarfile" accept=".jar" required><br><br>
+
+    <button type="submit">Yükle</button>
+  </form>
+</body>
+</html>
