@@ -1,4 +1,4 @@
-```    implementation("com.kaplandev.aic:aic:1.0")
+```     implementation("com.kaplandev.aic:aic:1.0")
     implementation("com.kaplandev.gitdw:gitdw:1.0")
     implementation("com.kaplandev:erorlog:1.1")
     implementation("com.kaplandev.teamcord:teamcord:1.0")
@@ -7,5 +7,7 @@
     implementation("com.kaplandev.kaplanhome:kaplanhome:1.0")
     implementation("com.kaplandev.bidibidi:bidibidi:1.0")
     implementation("com.kaplandev.mobpvpsettingsDisabled:Settings-Disabled:1.0")
-    implementation("com.kaplandev.mobpvp:mobpvp:3.0.4")
+    implementation("com.kaplandev.kaplanh:kaplanh:1.0")
+    implementation("com.kaplandev.plugin:plugin:1.0")
+    implementation("com.kaplandev.kaplanmusic:kaplanmusic:1.0")
 ```
