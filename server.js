@@ -56,16 +56,17 @@ app.post('/upload', upload.single('jarfile'), (req, res) => {
 
   fs.writeFileSync(path.join(targetDir, pomFilename), pomContent, 'utf8');
 
-  res.send(`
-    <h2>✅ Başarıyla yüklendi!</h2>
-    <p>Hedef klasör: ${targetDir}</p>
-    <ul>
-      <li>${jarFilename}</li>
-      <li>${pomFilename}</li>
-    </ul>
-    <a href="/">↩️ Geri dön</a>
-  `);
-});
+ res.json({
+  success: true,
+  message: "Dosya başarıyla yüklendi.",
+  path: targetDir,
+  jar: jarFilename,
+  pom: pomFilename
+}); // ← Bu satır burada biter
+
+}); // ← Bu da POST handler'ının kapanışı
+
+
 
 app.listen(port, () => {
   console.log(`Kaplan Maven Builder http://localhost:${port} üzerinde çalışıyor`);
